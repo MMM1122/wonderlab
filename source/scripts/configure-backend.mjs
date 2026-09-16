@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import {randomBytes,createHash} from 'node:crypto';
+const databaseId=process.argv[2];
+if(!databaseId||!/^[a-f0-9-]{36}$/i.test(databaseId))throw Error('Usage: node scripts/configure-backend.mjs D1_DATABASE_ID');
+const config=JSON.parse(fs.readFileSync('backend/wrangler.jsonc','utf8'));
+config.d1_databases[0].database_id=databaseId;
+if(fs.existsSync('backend/wrangler.local.json'))throw Error('Local configuration already exists; edit it to preserve your settings.');
+fs.writeFileSync('backend/wrangler.local.json',JSON.stringify(config,null,2));
+const key=randomBytes(32).toString('base64url');
+fs.writeFileSync('backend/admin-key.txt',key+'\n',{mode:0o600});
+fs.writeFileSync('backend/admin-key-secrets.json',JSON.stringify({ADMIN_KEY_SHA256:createHash('sha256').update(key).digest('hex'),IP_HASH_SECRET:randomBytes(32).toString('hex')}),{mode:0o600});
+console.log('Created backend/wrangler.local.json and private administrator files. Do not upload admin-key files to GitHub.');

@@ -36,9 +36,7 @@ Cloudflare Worker: validation, authentication, moderation
 - **Connected website:** the GitHub Pages frontend calls the deployed Worker. Articles and messages come from D1. A fresh database starts empty until the owner publishes content.
 - **Offline preview:** a self-contained HTML file displays the design and sample content. It does not send messages or publish articles.
 
-The original Sites implementation remains in the source for reference. Its authentication and database are separate from this edition; see [the original Sites notes](source/docs/original-sites.md). Deploying the new Worker does not migrate those records automatically.
-
-The complete editable project is in [`source/`](source/). Paths and commands below are relative to that folder. The repository root contains the compiled GitHub Pages site.
+The original Sites implementation remains in the source for reference. Its authentication and database are separate from this edition; see [the original Sites notes](docs/original-sites.md). Deploying the new Worker does not migrate those records automatically.
 
 ## Source layout
 
@@ -55,7 +53,7 @@ The complete editable project is in [`source/`](source/). Paths and commands bel
 
 ## Run and deploy
 
-Use Node.js 22.13 or later and install dependencies with `npm ci`. Follow [the backend setup guide](source/backend/README.md) to create D1, apply migrations, deploy the Worker, and configure secrets.
+Use Node.js 22.13 or later and install dependencies with `npm ci`. Follow [the backend setup guide](backend/README.md) to create D1, apply migrations, deploy the Worker, and configure secrets.
 
 Build the frontend with the Worker URL returned by deployment:
 
@@ -78,4 +76,4 @@ The integration suite covers access control, draft visibility, message moderatio
 
 The public feed currently returns up to 200 published articles and 100 approved messages. The dashboard paginates all records. Turnstile is optional and needs its own Cloudflare configuration; moderation and rate limits remain active without it. Email processing can occasionally send a duplicate after an interrupted attempt, so the dashboard remains the authoritative record of received messages.
 
-Still working on verified email delivery, original bilingual writing, and further refinements to the writing and exploration experience.
+Still working on production rollout, verified email delivery, and further refinements to the writing and exploration experience.

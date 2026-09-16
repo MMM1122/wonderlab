@@ -1,0 +1,8 @@
+source/backend/admin-key*
+source/backend/wrangler.local.json*
+source/backend/.dev.vars*
+source/node_modules/
+source/work/
+source/outputs/
+source/.wrangler/
+source/backend/.wrangler/

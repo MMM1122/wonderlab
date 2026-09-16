@@ -1,0 +1,21 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "wonder-lab-api",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-15",
+  "workers_dev": true,
+  "vars": {
+    "SITE_URL": "https://mmm1122.github.io/wonderlab/",
+    "NOTIFY_TO": "yvettewu2017@gmail.com",
+    "NOTIFY_FROM": "",
+    "TURNSTILE_SITE_KEY": ""
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "wonder-lab",
+    "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+    "migrations_dir": "migrations"
+  }],
+  "triggers": {"crons": ["*/5 * * * *"]},
+  "observability": {"enabled": true}
+}
