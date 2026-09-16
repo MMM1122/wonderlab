@@ -61,7 +61,7 @@ Official email binding reference: https://developers.cloudflare.com/email-servic
 
 ## Turnstile
 
-For a public guestbook, configure a widget for `mmm1122.github.io`. Set the public `TURNSTILE_SITE_KEY` variable and the private `TURNSTILE_SECRET_KEY` secret. Both are required together; a partial configuration blocks submissions. Without Turnstile, moderation, a honeypot, and per-IP rate limits remain active, but do not provide equivalent bot protection.
+For a public guestbook, configure a widget for the hostname in `SITE_URL` (for this deployment, `wonderlab.observer`). Set the public `TURNSTILE_SITE_KEY` variable and the private `TURNSTILE_SECRET_KEY` secret. Both are required together; a partial configuration blocks submissions. Without Turnstile, moderation, a honeypot, and per-IP rate limits remain active, but do not provide equivalent bot protection.
 
 Official validation reference: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
 

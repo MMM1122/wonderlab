@@ -5,7 +5,7 @@
   "compatibility_date": "2026-09-15",
   "workers_dev": true,
   "vars": {
-    "SITE_URL": "https://mmm1122.github.io/wonderlab/",
+    "SITE_URL": "https://wonderlab.observer/",
     "NOTIFY_TO": "yvettewu2017@gmail.com",
     "NOTIFY_FROM": "",
     "TURNSTILE_SITE_KEY": "",

@@ -27,7 +27,7 @@ async function start(){
  if(config.mode!=='preview'&&location.protocol!=='file:'){
   try{const r=await fetch(new URL('site-config.json',document.baseURI),{cache:'no-store',signal:AbortSignal.timeout(5000)});if(r.ok){const data=await r.json() as {apiBase?:unknown};if(typeof data.apiBase==='string')config={...config,apiBase:data.apiBase}}}catch{}
  }
- setBasePath(config.basePath||'/wonderlab/');
+ setBasePath(config.basePath||'/');
  createRoot(document.getElementById('root')!).render(<PreviewBoundary><Site config={config}/></PreviewBoundary>);
 }
 void start().catch(()=>{const status=document.getElementById('startup-status');if(status)status.textContent='站点配置无法读取，请检查配置文件。 / Site configuration could not be read.'});

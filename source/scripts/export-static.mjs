@@ -7,8 +7,8 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const destination=path.resolve(root,process.argv[2]||'work/static-export');
 const names=['intro-forest.png','intro-walk-longhair.png','cosmic-garden.png'];
 const assets=new Map(names.map(name=>['/'+name,'data:image/png;base64,'+fs.readFileSync(path.join(root,'public',name)).toString('base64')]));
-const live='https://mmm1122.github.io/wonderlab/';
-const basePath=process.env.WONDER_BASE_PATH||'/wonderlab/';
+const live=process.env.WONDER_SITE_URL||'https://wonderlab.observer/';
+const basePath=process.env.WONDER_BASE_PATH||'/';
 if(!/^\/[a-zA-Z0-9_\/-]*$/.test(basePath)||!basePath.endsWith('/'))throw Error('Invalid site base path');
 const apiBase=process.env.WONDER_API_URL||'';
 if(apiBase){const u=new URL(apiBase);if(u.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(u.hostname))throw Error('API URL must use HTTPS');}

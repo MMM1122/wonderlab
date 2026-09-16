@@ -2,9 +2,9 @@
 
 Updated September 16, 2026.
 
-- Home: https://mmm1122.github.io/wonderlab/
-- Writing studio: https://mmm1122.github.io/wonderlab/admin/
-- Public Blog: https://mmm1122.github.io/wonderlab/blog/
+- Home: https://wonderlab.observer/
+- Writing studio: https://wonderlab.observer/admin/
+- Public Blog: https://wonderlab.observer/blog/
 - API: https://wonder-lab-api.yvettewu-wonderlab.workers.dev
 - Database migrations: `0001_init.sql`, `0002_users_and_posts.sql`.
 

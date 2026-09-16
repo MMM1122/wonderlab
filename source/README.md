@@ -34,12 +34,12 @@ The shared visual components live in `app/`; `static/` contains the Pages entry 
 
 ## Routes and API
 
-On the existing GitHub Pages repository, routes are below `/wonderlab/`:
+The live site is [wonderlab.observer](https://wonderlab.observer/), hosted by GitHub Pages at the domain root:
 
-- `/wonderlab/`: home.
-- `/wonderlab/admin/`: email login and personal writing studio.
-- `/wonderlab/blog/`: public article list.
-- `/wonderlab/blog/?post=<slug>`: a shareable article URL that also works on direct visits and reloads without server rewrites.
+- `/`: home.
+- `/admin/`: email login and personal writing studio.
+- `/blog/`: public article list.
+- `/blog/?post=<slug>`: a shareable article URL that also works on direct visits and reloads without server rewrites.
 
 The Worker exposes the requested REST endpoints:
 
@@ -84,7 +84,7 @@ Follow [the backend guide](backend/README.md) to apply migrations and deploy. Fo
 WONDER_API_URL=https://YOUR_WORKER_URL npm run build:pages
 ```
 
-Publish the contents of `work/static-export/site/`, preserving the `assets`, `admin`, and `blog` directories. The default base path is `/wonderlab/`; set `WONDER_BASE_PATH=/` for a root-domain deployment. The offline HTML export remains a design preview with no live publishing.
+Publish the contents of `work/static-export/site/`, preserving the `assets`, `admin`, and `blog` directories. The default base path is `/` for the custom domain. For a project URL such as `username.github.io/wonderlab/`, set `WONDER_BASE_PATH=/wonderlab/` and update the Worker `SITE_URL` to that full URL. Keep the existing repository `CNAME` when publishing to the custom domain. The offline HTML export remains a design preview with no live publishing.
 
 Public email sign-in stays disabled until a working sender and secret are configured. See [email login setup](backend/EMAIL-LOGIN.md). The owner can still publish directly through the site's owner-key login during setup. Keep all administrator keys, mail secrets, local configuration, backups, and test inboxes out of GitHub.
 
