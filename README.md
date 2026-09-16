@@ -4,6 +4,8 @@ A bilingual personal space for thoughts, perspectives, and unexpected discoverie
 
 The visual world is deliberately playful: a long-haired explorer walks into a forest cave, falls through a geometric tunnel, and arrives in a surreal garden. Visitors can skip or replay the opening, switch between Chinese and English, and choose whether to play the ambient soundtrack. The forest and character artwork were generated with ImageGen. Music is synthesized in the browser with Web Audio; it begins only when the visitor presses play.
 
+The connected edition is now deployed. See [deployment details and the owner workflow](docs/deployment.md).
+
 ## Architecture
 
 The connected edition separates presentation, application logic, and persistent storage:
@@ -78,4 +80,4 @@ The integration suite covers access control, draft visibility, message moderatio
 
 The public feed currently returns up to 200 published articles and 100 approved messages. The dashboard paginates all records. Turnstile is optional and needs its own Cloudflare configuration; moderation and rate limits remain active without it. Email processing can occasionally send a duplicate after an interrupted attempt, so the dashboard remains the authoritative record of received messages.
 
-Still working on verified email delivery, original bilingual writing, and further refinements to the writing and exploration experience.
+Still working on original bilingual writing and further refinements to the writing and exploration experience.

@@ -76,4 +76,6 @@ The integration suite covers access control, draft visibility, message moderatio
 
 The public feed currently returns up to 200 published articles and 100 approved messages. The dashboard paginates all records. Turnstile is optional and needs its own Cloudflare configuration; moderation and rate limits remain active without it. Email processing can occasionally send a duplicate after an interrupted attempt, so the dashboard remains the authoritative record of received messages.
 
-Still working on production rollout, verified email delivery, and further refinements to the writing and exploration experience.
+The connected frontend and backend are deployed. Cloudflare accepted the notification test; inbox delivery has not been independently confirmed.
+
+Still working on original bilingual writing and further refinements to the writing and exploration experience.
