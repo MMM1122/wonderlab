@@ -1,81 +1,95 @@
 # Wonder Lab
 
-A bilingual personal space for thoughts, perspectives, and unexpected discoveries. Wonder Lab brings a dreamlike forest, a young explorer, and mathematical geometry into a journal that can hold many different interests.
+A bilingual home for curious minds: personal thoughts, perspectives, and discoveries, set in a surreal forest shaped by mathematical geometry.
 
-The visual world is deliberately playful: a long-haired explorer walks into a forest cave, falls through a geometric tunnel, and arrives in a surreal garden. Visitors can skip or replay the opening, switch between Chinese and English, and choose whether to play the ambient soundtrack. The forest and character artwork were generated with ImageGen. Music is synthesized in the browser with Web Audio; it begins only when the visitor presses play.
+Wonder Lab now has a public journal and a personal writing studio. Write directly on the website, keep unfinished ideas private, and publish when you are ready. Each verified email account has its own profile and articles. The forest entrance, long-haired explorer, generated artwork, geometric covers, and optional Web Audio soundtrack remain part of the experience.
 
-## Architecture
-
-The connected edition separates presentation, application logic, and persistent storage:
+## Application structure
 
 ```text
-Visitor or owner
-    |
-    v
-GitHub Pages: HTML, CSS, JavaScript, images
-    |
-    | HTTPS JSON requests
-    v
-Cloudflare Worker: validation, authentication, moderation
-    |
-    +--> D1: articles, messages, sessions, notification queue
-    |
-    +--> Email binding: reminders to the verified owner address
+Public website
+  Home                         Dream forest, recent writing, guestbook
+  Blog                         Published articles from all authors
+  Blog post                    Shareable article, author, language toggle
+
+Writing studio /admin/
+  Email sign-in                One-time code; first verification creates an account
+  My posts                     Only the signed-in author's articles
+  New / edit post              Bilingual text, category, preview
+  Draft / published            Private writing or public publication
+  Delete                       Explicit confirmation
+  Profile                      Public display name and biography
+  Owner tools                  Guestbook review and legacy owner-key access
+
+Cloudflare Worker
+  Authentication, authorization, validation, rate limits
+  D1: users, posts, email challenges, hashed sessions, guestbook, mail queue
+  Resend: email sign-in codes, once the sender and secret are configured
+  Cloudflare Email: existing owner notifications
 ```
 
-**Frontend.** React and TypeScript render the journal, animated entrance, language controls, guestbook, and owner dashboard. A Vite export produces files that GitHub Pages can serve directly. The public API address is embedded at build time and can be overridden by `site-config.json`. Administrator credentials are never embedded in this build.
+The frontend uses React, TypeScript, and a standalone Vite build. GitHub Pages serves the public assets; the Worker handles all database operations. The browser never receives a D1 credential, mail API key, or administrator secret as part of its bundle.
 
-**Backend.** A standalone Cloudflare Worker accepts anonymous messages and protects all owner actions. The owner can create bilingual drafts, publish or unpublish articles, edit content, and approve, hide, or delete messages. Drafts and unapproved messages are excluded from the public API.
+The shared visual components live in `app/`; `static/` contains the Pages entry point, router, Blog, and writing studio. `backend/worker.ts` is the separate API. SQL migrations live in `backend/migrations/`, and integration tests in `tests/backend.test.mjs`. The earlier Sites implementation is retained for reference and has a separate database and authentication system.
 
-**Storage.** Cloudflare D1 stores the site's records independently of any visitor's browser. Closing a tab does not delete submitted messages. The database also stores hashed login sessions, rate-limit counters, and a persistent notification queue.
+## Routes and API
 
-**Notifications.** Saving a message also creates a notification job. A scheduled Worker retries sending when necessary. Email requires a configured binding, sender, and verified destination; messages remain stored while email setup is incomplete. Provider acceptance is shown separately from a guarantee of inbox delivery.
+On the existing GitHub Pages repository, routes are below `/wonderlab/`:
 
-## Two editions
+- `/wonderlab/`: home.
+- `/wonderlab/admin/`: email login and personal writing studio.
+- `/wonderlab/blog/`: public article list.
+- `/wonderlab/blog/?post=<slug>`: a shareable article URL that also works on direct visits and reloads without server rewrites.
 
-- **Connected website:** the GitHub Pages frontend calls the deployed Worker. Articles and messages come from D1. A fresh database starts empty until the owner publishes content.
-- **Offline preview:** a self-contained HTML file displays the design and sample content. It does not send messages or publish articles.
+The Worker exposes the requested REST endpoints:
 
-The original Sites implementation remains in the source for reference. Its authentication and database are separate from this edition; see [the original Sites notes](docs/original-sites.md). Deploying the new Worker does not migrate those records automatically.
+- `POST /api/posts`: create your article.
+- `GET /api/posts`: paginated published articles.
+- `GET /api/posts?mine=1`: your private and published articles; authentication required.
+- `GET /api/posts/:slug`: one published article.
+- `PUT /api/posts/:id`: update your article; requires its current `version`.
+- `DELETE /api/posts/:id`: delete your article.
 
-## Source layout
+Email login uses `POST /api/auth/request-code` and `POST /api/auth/verify-code`. `GET /api/auth/me` returns the current account, `POST /api/auth/logout` revokes its session, and `PUT /api/profile` edits its display name and bio. Existing guestbook endpoints remain available.
 
-- `app/page.tsx`: shared journal interface and animated prologue.
-- `app/lab-service.ts`: service interface separating the shared UI from its backend.
-- `app/turnstile.tsx`: optional visitor verification widget.
-- `static/`: connected entry point, API client, owner dashboard, and styles.
-- `backend/worker.ts`: standalone API and scheduled notification processing.
-- `backend/migrations/`: D1 schema migrations.
-- `scripts/export-static.mjs`: GitHub Pages and single-file exports.
-- `scripts/configure-backend.mjs`: local deployment configuration and private key generation.
-- `tests/backend.test.mjs`: backend integration tests using SQLite.
-- `public/`: generated artwork and other public assets.
+## Account and data boundaries
 
-## Run and deploy
+Eight-digit codes expire after ten minutes, permit at most five verification attempts, and are consumed atomically. Codes are stored as keyed hashes, never returned by the API, and never placed in URLs. Requests are limited by IP, recipient, and a global daily quota. A failed send invalidates its challenge.
 
-Use Node.js 22.13 or later and install dependencies with `npm ci`. Follow [the backend setup guide](backend/README.md) to create D1, apply migrations, deploy the Worker, and configure secrets.
+Sessions are random bearer tokens with hashed server-side records. Email sessions last twelve hours; owner-key sessions last eight. The browser retains its session in tab-scoped `sessionStorage`, so refreshing the page preserves sign-in. Signing out revokes the server record and clears the local token. Shared-device users should explicitly sign out; a browser that restores a tab may also restore its session storage.
 
-Build the frontend with the Worker URL returned by deployment:
+Every write checks the authenticated author on the server. A submitted `user_id`, email, or role cannot change ownership or grant privileges. Public article responses contain author names, never account emails. Version checks prevent an older editor window from silently overwriting newer changes. Rendering uses plain React text rather than executing submitted HTML.
 
-```sh
-WONDER_API_URL=https://YOUR_WORKER_URL node scripts/export-static.mjs
-```
+The schema migration preserves existing posts and assigns them to the site owner. A verified login matching the configured owner email reaches that same account. The old owner key remains available during the transition. No original Sites records or offline sample posts are imported automatically.
 
-Upload the contents of `work/static-export/site/` to the GitHub Pages repository root. Keep `index.html`, `styles.css`, `site-config.json`, `.nojekyll`, and the `assets` folder together. The separate `index-connected.html` is an alternative single-file online build. `Wonder-Lab-离线预览.html` is the offline design preview.
+## Development
 
-Open the connected site and select **Manage / 管理后台**, or append `#admin` to the URL. Use the generated administrator key, kept privately in `backend/admin-key.txt`. Save this key in a password manager. Never upload `admin-key` files, secret JSON files, or local configuration files to a public repository.
-
-## Validation and limits
+Use Node.js 22.13 or later:
 
 ```sh
-node --test tests/backend.test.mjs
+npm ci
+npm run test:backend
 npx tsc --noEmit
+WONDER_API_URL=http://localhost:5180 WONDER_BASE_PATH=/ npm run build:pages -- work/connected-preview
+PORT=5180 npm run dev:connected
 ```
 
-The integration suite covers access control, draft visibility, message moderation, validation, session expiry and revocation, persistent rate limits, notification retries and leases, pagination, and incomplete verification configuration. Local browser checks have also covered submitting a message, approving it, and publishing an article. Production deployment and email delivery require separate live checks.
+The local preview uses disposable SQLite data and a mock email sender. Its most recent test email is written to ignored `work/dev-auth-inbox.json`; it never sends real email. This development adapter is not deployed to the Worker.
 
-The public feed currently returns up to 200 published articles and 100 approved messages. The dashboard paginates all records. Turnstile is optional and needs its own Cloudflare configuration; moderation and rate limits remain active without it. Email processing can occasionally send a duplicate after an interrupted attempt, so the dashboard remains the authoritative record of received messages.
+## Deployment
 
-The connected frontend and backend are deployed. Cloudflare accepted the notification test; inbox delivery has not been independently confirmed.
+Follow [the backend guide](backend/README.md) to apply migrations and deploy. For GitHub Pages:
 
-Still working on original bilingual writing and further refinements to the writing and exploration experience.
+```sh
+WONDER_API_URL=https://YOUR_WORKER_URL npm run build:pages
+```
+
+Publish the contents of `work/static-export/site/`, preserving the `assets`, `admin`, and `blog` directories. The default base path is `/wonderlab/`; set `WONDER_BASE_PATH=/` for a root-domain deployment. The offline HTML export remains a design preview with no live publishing.
+
+Public email sign-in stays disabled until a working sender and secret are configured. See [email login setup](backend/EMAIL-LOGIN.md). The owner can still publish directly through the site's owner-key login during setup. Keep all administrator keys, mail secrets, local configuration, backups, and test inboxes out of GitHub.
+
+## Validation
+
+Twenty-four backend integration tests cover authentication, code expiry and replay prevention, two-user isolation, private drafts, CRUD, profile privilege boundaries, session revocation, edit conflicts, CORS, mail failures, guestbook moderation, and migration of existing data. Local browser checks cover email sign-in, creating a draft, publishing, reading a standalone article, and maintaining sign-in across refreshes.
+
+Still working on production email-login onboarding, original bilingual writing, and the little details that make this world feel alive.

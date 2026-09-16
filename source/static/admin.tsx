@@ -8,8 +8,8 @@ type Post={id:string;title:string;titleEn:string;body:string;bodyEn:string;categ
 type Note={id:string;name:string;body:string;status:string;createdAt:number;notificationStatus:string;notificationError?:string};
 type Overview={posts:Post[];comments:Note[];postCount:number;commentCount:number;pendingCount:number;notificationsConfigured:boolean;turnstileConfigured:boolean};
 const blank:Post={id:'',title:'',titleEn:'',body:'',bodyEn:'',category:'thoughts',status:'draft'};
-export function Admin({open,onClose,onChanged,connected}:{open:boolean;onClose:()=>void;onChanged:()=>void;connected:boolean}){
- const[authed,setAuthed]=useState(hasSession),[key,setKey]=useState(''),[data,setData]=useState<Overview|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[draft,setDraft]=useState<Post|null>(null),[pp,setPP]=useState(0),[cp,setCP]=useState(0),[tab,setTab]=useState<'posts'|'comments'>('posts'),[confirm,setConfirm]=useState<{action:string;id:string;title:string}|null>(null);
+export function Admin({open,onClose,onChanged,connected,initialTab='posts'}:{open:boolean;onClose:()=>void;onChanged:()=>void;connected:boolean;initialTab?:'posts'|'comments'}){
+ const[authed,setAuthed]=useState(hasSession),[key,setKey]=useState(''),[data,setData]=useState<Overview|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[draft,setDraft]=useState<Post|null>(null),[pp,setPP]=useState(0),[cp,setCP]=useState(0),[tab,setTab]=useState<'posts'|'comments'>(initialTab),[confirm,setConfirm]=useState<{action:string;id:string;title:string}|null>(null);
  async function refresh(){try{const result=await api<Overview>(`/api/admin?postPage=${pp}&commentPage=${cp}`,undefined,true);setData(result);setError('')}catch(e){setError((e as Error).message);if(!hasSession())setAuthed(false)}}
  useEffect(()=>{if(open&&authed)void refresh()},[open,authed,pp,cp]);
  async function signIn(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{await login(key);setKey('');setAuthed(true)}catch(e){setError((e as Error).message)}finally{setBusy(false)}}

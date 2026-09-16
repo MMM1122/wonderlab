@@ -8,14 +8,25 @@
     "SITE_URL": "https://mmm1122.github.io/wonderlab/",
     "NOTIFY_TO": "yvettewu2017@gmail.com",
     "NOTIFY_FROM": "",
-    "TURNSTILE_SITE_KEY": ""
+    "TURNSTILE_SITE_KEY": "",
+    "OWNER_EMAIL": "yvettewu2017@gmail.com",
+    "AUTH_MAIL_PROVIDER": "resend",
+    "AUTH_FROM": ""
   },
-  "d1_databases": [{
-    "binding": "DB",
-    "database_name": "wonder-lab",
-    "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
-    "migrations_dir": "migrations"
-  }],
-  "triggers": {"crons": ["*/5 * * * *"]},
-  "observability": {"enabled": true}
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wonder-lab",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
+  "observability": {
+    "enabled": true
+  }
 }

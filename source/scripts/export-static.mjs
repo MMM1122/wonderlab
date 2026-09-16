@@ -8,9 +8,11 @@ const destination=path.resolve(root,process.argv[2]||'work/static-export');
 const names=['intro-forest.png','intro-walk-longhair.png','cosmic-garden.png'];
 const assets=new Map(names.map(name=>['/'+name,'data:image/png;base64,'+fs.readFileSync(path.join(root,'public',name)).toString('base64')]));
 const live='https://mmm1122.github.io/wonderlab/';
+const basePath=process.env.WONDER_BASE_PATH||'/wonderlab/';
+if(!/^\/[a-zA-Z0-9_\/-]*$/.test(basePath)||!basePath.endsWith('/'))throw Error('Invalid site base path');
 const apiBase=process.env.WONDER_API_URL||'';
 if(apiBase){const u=new URL(apiBase);if(u.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(u.hostname))throw Error('API URL must use HTTPS');}
-const configTag=(mode)=>'<script type="application/json" id="wonder-config">'+JSON.stringify({mode,apiBase:mode==='preview'?'':apiBase}).replaceAll('<','\\u003c')+'</script>';
+const configTag=(mode)=>'<script type="application/json" id="wonder-config">'+JSON.stringify({mode,apiBase:mode==='preview'?'':apiBase,basePath}).replaceAll('<','\\u003c')+'</script>';
 const result=await build({
  configFile:false,root,
  define:{'process.env.NODE_ENV':JSON.stringify('production')},
@@ -46,8 +48,11 @@ for(const [url,data] of assets){
 }
 fs.writeFileSync(path.join(destination,'site/assets/app.js'),staticJS);
 fs.writeFileSync(path.join(destination,'site/styles.css'),staticCSS+extraCSS);
-fs.writeFileSync(path.join(destination,'site/index.html'),head+'<link rel="stylesheet" href="./styles.css"></head>'+body+configTag('connected')+'<script defer src="./assets/app.js"></script></body></html>');
+fs.writeFileSync(path.join(destination,'site/index.html'),head+'<base href="'+basePath+'"><link rel="stylesheet" href="./styles.css"></head>'+body+configTag('connected')+'<script defer src="./assets/app.js"></script></body></html>');
 fs.writeFileSync(path.join(destination,'site/.nojekyll'),'');
 fs.writeFileSync(path.join(destination,'site/site-config.json'),JSON.stringify({apiBase},null,2));
 fs.writeFileSync(path.join(destination,'index-connected.html'),head+'<style>'+css+extraCSS+'</style></head>'+body+configTag('connected')+'<script>'+inlineScript+'</script></body></html>');
 console.log('Created standalone HTML and GitHub Pages files in '+destination);
+
+for(const route of ['admin','blog']){fs.mkdirSync(path.join(destination,'site',route),{recursive:true});fs.copyFileSync(path.join(destination,'site/index.html'),path.join(destination,'site',route,'index.html'));}
+fs.copyFileSync(path.join(destination,'site/index.html'),path.join(destination,'site/404.html'));

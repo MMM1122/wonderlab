@@ -1,10 +1,11 @@
 # Wonder Lab backend
 
-A standalone Cloudflare Worker and D1 database for the GitHub Pages frontend. It does not use the original Sites authentication headers or share the original Sites database.
+A multi-user Cloudflare Worker and D1 database for the GitHub Pages frontend. It does not use the original Sites authentication headers or share the original Sites database.
 
 ## Features
 
-- Owner sign-in using a randomly generated administrator key.
+- Passwordless verified email accounts, per-user profiles, and author-scoped REST article endpoints.
+- Owner sign-in using a randomly generated administrator key remains available during email setup.
 - Bilingual articles with private drafts, publication, editing, and deletion.
 - Anonymous guestbook submissions, private by default; the owner can approve, hide, or delete them.
 - Persistent notification queue, retry handling, and visible send status in the dashboard.
@@ -24,7 +25,7 @@ npx wrangler deploy --config backend/wrangler.local.json
 npx wrangler secret bulk backend/admin-key-secrets.json --config backend/wrangler.local.json
 ```
 
-Deployment initially fails closed until the administrator hash and IP hash secret are configured. Save `backend/admin-key.txt` in your password manager. Never commit it or `backend/admin-key-secrets.json`. The browser uses the key only to obtain an 8-hour session. The session token stays in memory and disappears when the page reloads. Signing out revokes it. Rotating the administrator hash also invalidates existing sessions.
+Deployment initially fails closed until the administrator hash and IP hash secret are configured. Save `backend/admin-key.txt` in your password manager. Never commit it or `backend/admin-key-secrets.json`. The browser uses the key only to obtain an 8-hour session. The session token stays in tab-scoped sessionStorage and survives reloads until expiry. Signing out revokes it and clears the browser token. Rotating the administrator hash also invalidates existing sessions.
 
 Build the frontend using the actual URL returned by Wrangler:
 
@@ -36,7 +37,11 @@ Upload the contents of `work/static-export/site/` to your GitHub Pages repositor
 
 Use the normal Pages build for smaller uploads and separate asset caching. Use the single-file build when you specifically need one HTML file. The file named `Wonder-Lab-离线预览.html` deliberately stays in preview mode.
 
-Open your site and click **Manage / 管理后台**, or add `#admin` to the site URL. The first public article list will be empty until you publish an article; it will not silently substitute sample posts for a failed database connection.
+Open your site and click **Manage / 管理后台**, or open `/wonderlab/admin/`. The old `#admin` link remains compatible. The first public article list will be empty until you publish an article; it will not silently substitute sample posts for a failed database connection.
+
+## Email sign-in
+
+See [EMAIL-LOGIN.md](EMAIL-LOGIN.md) for Resend sender verification and secret configuration. Public email login remains disabled until configured. Apply both SQL migrations; the second preserves existing posts under the site-owner account.
 
 ## Email reminders
 
