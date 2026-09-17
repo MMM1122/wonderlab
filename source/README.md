@@ -24,7 +24,7 @@ Writing studio /admin/
 Cloudflare Worker
   Authentication, authorization, validation, rate limits
   D1: users, posts, email challenges, hashed sessions, guestbook, mail queue
-  Resend: email sign-in codes, once the sender and secret are configured
+  Resend: one-time email sign-in codes
   Cloudflare Email: existing owner notifications
 ```
 
@@ -86,10 +86,10 @@ WONDER_API_URL=https://YOUR_WORKER_URL npm run build:pages
 
 Publish the contents of `work/static-export/site/`, preserving the `assets`, `admin`, and `blog` directories. The default base path is `/` for the custom domain. For a project URL such as `username.github.io/wonderlab/`, set `WONDER_BASE_PATH=/wonderlab/` and update the Worker `SITE_URL` to that full URL. Keep the existing repository `CNAME` when publishing to the custom domain. The offline HTML export remains a design preview with no live publishing.
 
-Public email sign-in stays disabled until a working sender and secret are configured. See [email login setup](backend/EMAIL-LOGIN.md). The owner can still publish directly through the site's owner-key login during setup. Keep all administrator keys, mail secrets, local configuration, backups, and test inboxes out of GitHub.
+Public email sign-in is enabled on the live site. The Resend sender domain is verified, its sending-only API key is limited to that domain and stored as a Cloudflare Secret, and the first production sign-in email has been confirmed delivered. For a fresh deployment, follow [email login setup](backend/EMAIL-LOGIN.md); sign-in remains disabled until its sender and secret are configured. The existing owner-key login remains available. Keep all administrator keys, mail secrets, local configuration, backups, and test inboxes out of GitHub.
 
 ## Validation
 
 Twenty-four backend integration tests cover authentication, code expiry and replay prevention, two-user isolation, private drafts, CRUD, profile privilege boundaries, session revocation, edit conflicts, CORS, mail failures, guestbook moderation, and migration of existing data. Local browser checks cover email sign-in, creating a draft, publishing, reading a standalone article, and maintaining sign-in across refreshes.
 
-Still working on production email-login onboarding, original bilingual writing, and the little details that make this world feel alive.
+Still working on broader user testing, original bilingual writing, and the little details that make this world feel alive.

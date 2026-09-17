@@ -2,6 +2,10 @@
 
 The app implements passwordless email verification. Sending codes to regular visitors requires a mail service that can send to arbitrary recipients. The existing Cloudflare binding is restricted to the owner's notification address and is intentionally kept separate.
 
+## Live deployment status
+
+As of September 16, 2026, `auth.yvettewu.com` is verified. A sending-only key restricted to this domain is stored in Worker `wonder-lab-api` as `RESEND_API_KEY`. Public email sign-in is enabled, and Resend confirmed delivery of the first production sign-in email to the owner. The final owner sign-in and a second consenting real-user check remain to be confirmed; local verification and account-isolation tests have passed. Never copy the production key into this repository.
+
 ## Resend
 
 1. Create or sign in to your Resend account.
