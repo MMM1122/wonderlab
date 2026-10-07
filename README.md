@@ -1,5 +1,5 @@
 # Wonder Lab
-The site is live at http://wonderlab.observer/
+The site is live at http://wonderlab.observer/.          
 A bilingual home for curious minds: personal thoughts, perspectives, and discoveries, set in a surreal forest shaped by mathematical geometry.
 
 Wonder Lab now has a public journal and a personal writing studio. Write directly on the website, keep unfinished ideas private, and publish when you are ready. Each verified email account has its own profile and articles. The forest entrance, long-haired explorer, generated artwork, geometric covers, and optional Web Audio soundtrack remain part of the experience.
